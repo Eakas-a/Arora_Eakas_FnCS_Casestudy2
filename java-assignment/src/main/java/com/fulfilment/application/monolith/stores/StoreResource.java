@@ -2,7 +2,6 @@ package com.fulfilment.application.monolith.stores;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
@@ -34,17 +33,19 @@ public class StoreResource {
   // is guaranteed to only ever hear about a Store once it's confirmed to be in our database.
   @Inject Event<StoreChangedEvent> storeChangedEvent;
 
+  @Inject StoreRepository storeRepository;
+
   private static final Logger LOGGER = Logger.getLogger(StoreResource.class.getName());
 
   @GET
   public List<Store> get() {
-    return Store.listAll(Sort.by("name"));
+    return storeRepository.listAllOrderedByName();
   }
 
   @GET
   @Path("{id}")
   public Store getSingle(Long id) {
-    Store entity = Store.findById(id);
+    Store entity = storeRepository.findById(id);
     if (entity == null) {
       throw new WebApplicationException("Store with id of " + id + " does not exist.", 404);
     }
@@ -58,7 +59,7 @@ public class StoreResource {
       throw new WebApplicationException("Id was invalidly set on request.", 422);
     }
 
-    store.persist();
+    storeRepository.persist(store);
 
     storeChangedEvent.fire(new StoreChangedEvent(store, StoreChangedEvent.Type.CREATED));
 
@@ -73,7 +74,7 @@ public class StoreResource {
       throw new WebApplicationException("Store Name was not set on request.", 422);
     }
 
-    Store entity = Store.findById(id);
+    Store entity = storeRepository.findById(id);
 
     if (entity == null) {
       throw new WebApplicationException("Store with id of " + id + " does not exist.", 404);
@@ -95,7 +96,7 @@ public class StoreResource {
       throw new WebApplicationException("Store Name was not set on request.", 422);
     }
 
-    Store entity = Store.findById(id);
+    Store entity = storeRepository.findById(id);
 
     if (entity == null) {
       throw new WebApplicationException("Store with id of " + id + " does not exist.", 404);
@@ -118,11 +119,11 @@ public class StoreResource {
   @Path("{id}")
   @Transactional
   public Response delete(Long id) {
-    Store entity = Store.findById(id);
+    Store entity = storeRepository.findById(id);
     if (entity == null) {
       throw new WebApplicationException("Store with id of " + id + " does not exist.", 404);
     }
-    entity.delete();
+    storeRepository.delete(entity);
     return Response.status(204).build();
   }
 
