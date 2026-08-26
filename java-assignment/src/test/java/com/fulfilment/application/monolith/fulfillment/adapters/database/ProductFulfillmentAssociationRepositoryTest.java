@@ -11,6 +11,7 @@ import com.fulfilment.application.monolith.warehouses.adapters.database.Warehous
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,57 @@ class ProductFulfillmentAssociationRepositoryTest {
   @Inject ProductFulfillmentAssociationRepository repository;
   @Inject WarehouseRepository warehouseRepository;
   @Inject ProductRepository productRepository;
+
+  @BeforeEach
+  void setUp() {
+    // Create test data that is expected by the tests
+    QuarkusTransaction.requiringNew().run(() -> {
+      // Ensure test products exist
+      if (productRepository.findById(1L) == null) {
+        Product p1 = new Product("Test Product 1");
+        p1.persist();
+      }
+      if (productRepository.findById(2L) == null) {
+        Product p2 = new Product("Test Product 2");
+        p2.persist();
+      }
+      if (productRepository.findById(3L) == null) {
+        Product p3 = new Product("Test Product 3");
+        p3.persist();
+      }
+
+      // Ensure test stores exist
+      if (Store.findById(1L) == null) {
+        Store s1 = new Store("Test Store 1");
+        s1.persist();
+      }
+      if (Store.findById(2L) == null) {
+        Store s2 = new Store("Test Store 2");
+        s2.persist();
+      }
+      if (Store.findById(3L) == null) {
+        Store s3 = new Store("Test Store 3");
+        s3.persist();
+      }
+
+      // Ensure test warehouses exist
+      if (warehouseRepository.findById(1L) == null) {
+        DbWarehouse w1 = new DbWarehouse();
+        w1.businessUnitCode = "WH.TEST.001";
+        w1.persist();
+      }
+      if (warehouseRepository.findById(2L) == null) {
+        DbWarehouse w2 = new DbWarehouse();
+        w2.businessUnitCode = "WH.TEST.002";
+        w2.persist();
+      }
+      if (warehouseRepository.findById(3L) == null) {
+        DbWarehouse w3 = new DbWarehouse();
+        w3.businessUnitCode = "WH.TEST.003";
+        w3.persist();
+      }
+    });
+  }
 
   @AfterEach
   void cleanUp() {
