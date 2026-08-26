@@ -21,7 +21,7 @@ class StoreResourceUnitTest {
     Store a = mock(Store.class);
     a.name = "A";
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      // Use a specific Sort instance or anySort matcher properly
+      // Use specific Sort instance
       mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
       assertEquals(List.of(a), resource.get());
     }
@@ -33,11 +33,11 @@ class StoreResourceUnitTest {
     Store a = mock(Store.class);
     a.name = "A";
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      // For static mocks, use anyLong() from the static import
-      mocked.when(() -> Store.findById(anyLong())).thenReturn(a);
+      // Use specific literal values instead of matchers
+      mocked.when(() -> Store.findById(1L)).thenReturn(a);
       assertSame(a, resource.getSingle(1L));
 
-      mocked.when(() -> Store.findById(anyLong())).thenReturn(null);
+      mocked.when(() -> Store.findById(2L)).thenReturn(null);
       WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
       assertEquals(404, ex.getResponse().getStatus());
     }
@@ -77,13 +77,13 @@ class StoreResourceUnitTest {
 
       Store updated = new Store("NEW");
       updated.quantityProductsInStock = 7;
-      mocked.when(() -> Store.findById(eq(1L))).thenReturn(null);
+      mocked.when(() -> Store.findById(1L)).thenReturn(null);
       WebApplicationException missing = assertThrows(WebApplicationException.class,
           () -> resource.update(1L, updated));
       assertEquals(404, missing.getResponse().getStatus());
 
       Store existing = new Store("OLD");
-      mocked.when(() -> Store.findById(eq(2L))).thenReturn(existing);
+      mocked.when(() -> Store.findById(2L)).thenReturn(existing);
       Store result = resource.update(2L, updated);
       assertSame(existing, result);
       assertEquals("NEW", existing.name);
@@ -105,7 +105,7 @@ class StoreResourceUnitTest {
     updated.quantityProductsInStock = 9;
 
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      mocked.when(() -> Store.findById(eq(1L))).thenReturn(existing);
+      mocked.when(() -> Store.findById(1L)).thenReturn(existing);
 
       Store result = resource.patch(1L, updated);
       assertEquals("NEW", result.name);
@@ -113,7 +113,7 @@ class StoreResourceUnitTest {
 
       Store nullNameZeroStock = new Store();
       nullNameZeroStock.quantityProductsInStock = 0;
-      mocked.when(() -> Store.findById(eq(2L))).thenReturn(nullNameZeroStock);
+      mocked.when(() -> Store.findById(2L)).thenReturn(nullNameZeroStock);
       Store second = resource.patch(2L, updated);
       assertNull(second.name);
       assertEquals(0, second.quantityProductsInStock);
@@ -133,15 +133,15 @@ class StoreResourceUnitTest {
           () -> resource.patch(1L, invalid));
       assertEquals(422, validation.getResponse().getStatus());
 
-      mocked.when(() -> Store.findById(eq(1L))).thenReturn(null);
+      mocked.when(() -> Store.findById(1L)).thenReturn(null);
       WebApplicationException missingPatch = assertThrows(WebApplicationException.class,
           () -> resource.patch(1L, new Store("X")));
       assertEquals(404, missingPatch.getResponse().getStatus());
 
-      mocked.when(() -> Store.findById(eq(2L))).thenReturn(new Store("X"));
+      mocked.when(() -> Store.findById(2L)).thenReturn(new Store("X"));
       assertEquals(204, resource.delete(2L).getStatus());
 
-      mocked.when(() -> Store.findById(eq(3L))).thenReturn(null);
+      mocked.when(() -> Store.findById(3L)).thenReturn(null);
       WebApplicationException missingDelete = assertThrows(WebApplicationException.class,
           () -> resource.delete(3L));
       assertEquals(404, missingDelete.getResponse().getStatus());

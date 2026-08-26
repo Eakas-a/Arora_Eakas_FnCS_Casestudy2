@@ -72,7 +72,8 @@ class ProductFulfillmentAssociationRepositoryUnitTest {
   void findReturnsNullAndUpdateHandlesBothPaths() {
     ProductFulfillmentAssociationRepository repo = spy(new ProductFulfillmentAssociationRepository());
     PanacheQuery<DbProductFulfillmentAssociation> query = mock(PanacheQuery.class);
-    doReturn(query).when(repo).find(anyString(), any(), any(), any());
+    // Use specific string values instead of anyString()
+    doReturn(query).when(repo).find("product.id = ?1 and store.id = ?2 and warehouse.id = ?3", 1L, 2L, 3L);
     when(query.firstResult()).thenReturn(null);
     assertNull(repo.find(1L, 2L, 3L));
 

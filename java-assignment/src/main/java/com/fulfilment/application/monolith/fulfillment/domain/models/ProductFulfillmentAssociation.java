@@ -1,14 +1,16 @@
 package com.fulfilment.application.monolith.fulfillment.domain.models;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+
 import com.fulfilment.application.monolith.products.Product;
 import com.fulfilment.application.monolith.stores.Store;
 import com.fulfilment.application.monolith.warehouses.adapters.database.DbWarehouse;
 
-@Entity
+/**
+ * Domain model for product fulfillment associations.
+ * Note: This is a domain model, NOT a JPA entity.
+ * JPA persistence is handled by {@link com.fulfilment.application.monolith.fulfillment.adapters.database.DbProductFulfillmentAssociation}.
+ */
 public class ProductFulfillmentAssociation {
 
-  @Id
   public Long id;
 
   public Product product;
