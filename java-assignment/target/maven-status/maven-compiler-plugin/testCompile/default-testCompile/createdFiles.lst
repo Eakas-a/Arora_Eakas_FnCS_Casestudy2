@@ -1,0 +1,17 @@
+com\fulfilment\application\monolith\products\ProductResourceCrudTest.class
+com\fulfilment\application\monolith\products\ProductResourceUnitTest.class
+com\fulfilment\application\monolith\stores\StoreResourceTest.class
+com\fulfilment\application\monolith\warehouses\domain\usecases\CreateWarehouseUseCaseTest.class
+com\fulfilment\application\monolith\fulfillment\domain\usecases\AssociateFulfillmentUnitUseCaseTest.class
+com\fulfilment\application\monolith\products\ProductEndpointTest.class
+com\fulfilment\application\monolith\warehouses\adapters\database\WarehouseRepositoryUnitTest.class
+com\fulfilment\application\monolith\warehouses\domain\usecases\ArchiveWarehouseUseCaseTest.class
+com\fulfilment\application\monolith\fulfillment\adapters\restapi\FulfillmentValidationExceptionMapperTest.class
+com\fulfilment\application\monolith\stores\StoreResourceUnitTest.class
+com\fulfilment\application\monolith\warehouses\domain\exceptions\WarehouseExceptionsTest.class
+com\fulfilment\application\monolith\warehouses\adapters\restapi\WarehouseResourceImplTest.class
+com\fulfilment\application\monolith\warehouses\adapters\database\WarehouseRepositoryTest.class
+com\fulfilment\application\monolith\stores\StoreLegacySyncObserverTest.class
+com\fulfilment\application\monolith\stores\LegacyStoreManagerGatewayTest.class
+com\fulfilment\application\monolith\warehouses\adapters\restapi\WarehouseEndpointIT.class
+com\fulfilment\application\monolith\warehouses\domain\usecases\ReplaceWarehouseUseCaseTest.class

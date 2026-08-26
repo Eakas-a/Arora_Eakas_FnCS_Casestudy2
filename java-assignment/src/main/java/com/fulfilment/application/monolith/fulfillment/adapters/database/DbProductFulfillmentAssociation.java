@@ -33,6 +33,7 @@ public class DbProductFulfillmentAssociation extends PanacheEntity {
 
   public static DbProductFulfillmentAssociation fromDomain(ProductFulfillmentAssociation domain) {
     DbProductFulfillmentAssociation entity = new DbProductFulfillmentAssociation();
+    entity.id = domain.id;
     entity.product = domain.product;
     entity.store = domain.store;
     entity.warehouse = domain.warehouse;

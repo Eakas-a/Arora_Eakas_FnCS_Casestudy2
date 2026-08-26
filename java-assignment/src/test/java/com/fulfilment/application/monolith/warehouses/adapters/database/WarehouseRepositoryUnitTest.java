@@ -79,6 +79,7 @@ class WarehouseRepositoryUnitTest {
     assertNotNull(found);
     assertEquals("CODE", found.businessUnitCode);
 
+    doNothing().when(repo).delete(d);
     repo.remove(w);
     verify(repo).delete(d);
 
