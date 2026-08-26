@@ -21,7 +21,7 @@ void getReturnsStores() {
   Store a = mock(Store.class);
   a.name = "A";
   try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-    mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
+    mocked.when(() -> Store.listAll(any())).thenReturn(List.of(a));
     assertEquals(List.of(a), resource.get());
   }
 }
