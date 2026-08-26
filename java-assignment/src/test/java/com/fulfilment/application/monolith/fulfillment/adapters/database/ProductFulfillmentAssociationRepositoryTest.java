@@ -29,15 +29,15 @@ class ProductFulfillmentAssociationRepositoryTest {
       // Ensure test products exist
       if (productRepository.findById(1L) == null) {
         Product p1 = new Product("Test Product 1");
-        p1.persist();
+        productRepository.persist(p1);
       }
       if (productRepository.findById(2L) == null) {
         Product p2 = new Product("Test Product 2");
-        p2.persist();
+        productRepository.persist(p2);
       }
       if (productRepository.findById(3L) == null) {
         Product p3 = new Product("Test Product 3");
-        p3.persist();
+        productRepository.persist(p3);
       }
 
       // Ensure test stores exist
@@ -58,17 +58,17 @@ class ProductFulfillmentAssociationRepositoryTest {
       if (warehouseRepository.findById(1L) == null) {
         DbWarehouse w1 = new DbWarehouse();
         w1.businessUnitCode = "WH.TEST.001";
-        w1.persist();
+        warehouseRepository.persist(w1);
       }
       if (warehouseRepository.findById(2L) == null) {
         DbWarehouse w2 = new DbWarehouse();
         w2.businessUnitCode = "WH.TEST.002";
-        w2.persist();
+        warehouseRepository.persist(w2);
       }
       if (warehouseRepository.findById(3L) == null) {
         DbWarehouse w3 = new DbWarehouse();
         w3.businessUnitCode = "WH.TEST.003";
-        w3.persist();
+        warehouseRepository.persist(w3);
       }
     });
   }
