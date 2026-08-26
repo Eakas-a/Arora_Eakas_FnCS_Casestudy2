@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.fulfilment.application.monolith.fulfillment.adapters.database.ProductFulfillmentAssociationRepositoryUnitTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.267 s -- in com.fulfilment.application.monolith.fulfillment.adapters.database.ProductFulfillmentAssociationRepositoryUnitTest
