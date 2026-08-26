@@ -33,11 +33,11 @@ void getSingleFoundAndMissing() {
   Store a = mock(Store.class);
   a.name = "A";
   try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-    // For static mocks, use ArgumentMatchers.anyLong() explicitly
-    mocked.when(() -> Store.findById(ArgumentMatchers.anyLong())).thenReturn(a);
+    // For static mocks, use anyLong() from the static import
+    mocked.when(() -> Store.findById(anyLong())).thenReturn(a);
     assertSame(a, resource.getSingle(1L));
 
-    mocked.when(() -> Store.findById(ArgumentMatchers.anyLong())).thenReturn(null);
+    mocked.when(() -> Store.findById(anyLong())).thenReturn(null);
     WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
     assertEquals(404, ex.getResponse().getStatus());
   }
