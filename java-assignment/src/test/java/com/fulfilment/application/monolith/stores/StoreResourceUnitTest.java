@@ -15,13 +15,13 @@ import org.mockito.MockedStatic;
 
 class StoreResourceUnitTest {
 
-  @Test
+@Test
 void getReturnsStores() {
   StoreResource resource = new StoreResource();
   Store a = mock(Store.class);
   a.name = "A";
   try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-    mocked.when(() -> Store.listAll(any())).thenReturn(List.of(a));
+    mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
     assertEquals(List.of(a), resource.get());
   }
 }
@@ -32,10 +32,10 @@ void getSingleFoundAndMissing() {
   Store a = mock(Store.class);
   a.name = "A";
   try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-    mocked.when(() -> Store.findById(1L)).thenReturn(a);
+    mocked.when(() -> Store.findById(anyLong())).thenReturn(a);
     assertSame(a, resource.getSingle(1L));
 
-    mocked.when(() -> Store.findById(2L)).thenReturn(null);
+    mocked.when(() -> Store.findById(anyLong())).thenReturn(null);
     WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
     assertEquals(404, ex.getResponse().getStatus());
   }
@@ -75,7 +75,7 @@ void getSingleFoundAndMissing() {
 
       Store updated = new Store("NEW");
       updated.quantityProductsInStock = 7;
-      mocked.when(() -> Store.findById(1L)).thenReturn(null);
+      mocked.when(() -> Store.findById(eq(1L))).thenReturn(null);
       WebApplicationException missing = assertThrows(WebApplicationException.class,
           () -> resource.update(1L, updated));
       assertEquals(404, missing.getResponse().getStatus());
@@ -103,14 +103,17 @@ void getSingleFoundAndMissing() {
     updated.quantityProductsInStock = 9;
 
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      mocked.when(() -> Store.findById(1L)).thenReturn(existing);
+      
+      mocked.when(() -> Store.findById(eq(1L))).thenReturn(existing);
+
       Store result = resource.patch(1L, updated);
       assertEquals("NEW", result.name);
       assertEquals(9, result.quantityProductsInStock);
 
       Store nullNameZeroStock = new Store();
       nullNameZeroStock.quantityProductsInStock = 0;
-      mocked.when(() -> Store.findById(2L)).thenReturn(nullNameZeroStock);
+      mocked.when(() -> Store.findById(eq(2L))).thenReturn(nullNameZeroStock);
+      //mocked.when(() -> Store.findById(2L)).thenReturn(nullNameZeroStock);
       Store second = resource.patch(2L, updated);
       assertNull(second.name);
       assertEquals(0, second.quantityProductsInStock);
@@ -130,15 +133,15 @@ void getSingleFoundAndMissing() {
           () -> resource.patch(1L, invalid));
       assertEquals(422, validation.getResponse().getStatus());
 
-      mocked.when(() -> Store.findById(1L)).thenReturn(null);
+      mocked.when(() -> Store.findById(eq(1L))).thenReturn(null);
       WebApplicationException missingPatch = assertThrows(WebApplicationException.class,
           () -> resource.patch(1L, new Store("X")));
       assertEquals(404, missingPatch.getResponse().getStatus());
 
-      mocked.when(() -> Store.findById(2L)).thenReturn(new Store("X"));
+      mocked.when(() -> Store.findById(eq(2L))).thenReturn(new Store("X"));
       assertEquals(204, resource.delete(2L).getStatus());
 
-      mocked.when(() -> Store.findById(3L)).thenReturn(null);
+      mocked.when(() -> Store.findById(eq(3L))).thenReturn(null);
       WebApplicationException missingDelete = assertThrows(WebApplicationException.class,
           () -> resource.delete(3L));
       assertEquals(404, missingDelete.getResponse().getStatus());
