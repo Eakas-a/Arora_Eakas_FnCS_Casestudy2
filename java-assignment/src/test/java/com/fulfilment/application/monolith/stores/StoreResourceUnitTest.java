@@ -16,28 +16,30 @@ import org.mockito.MockedStatic;
 class StoreResourceUnitTest {
 
   @Test
-  void getReturnsStores() {
-    StoreResource resource = new StoreResource();
-    Store a = new Store("A");
-    try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
-      assertEquals(List.of(a), resource.get());
-    }
+void getReturnsStores() {
+  StoreResource resource = new StoreResource();
+  Store a = mock(Store.class);
+  a.name = "A";
+  try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
+    mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
+    assertEquals(List.of(a), resource.get());
   }
+}
 
-  @Test
-  void getSingleFoundAndMissing() {
-    StoreResource resource = new StoreResource();
-    Store a = new Store("A");
-    try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      mocked.when(() -> Store.findById(1L)).thenReturn(a);
-      assertSame(a, resource.getSingle(1L));
+@Test
+void getSingleFoundAndMissing() {
+  StoreResource resource = new StoreResource();
+  Store a = mock(Store.class);
+  a.name = "A";
+  try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
+    mocked.when(() -> Store.findById(1L)).thenReturn(a);
+    assertSame(a, resource.getSingle(1L));
 
-      mocked.when(() -> Store.findById(2L)).thenReturn(null);
-      WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
-      assertEquals(404, ex.getResponse().getStatus());
-    }
+    mocked.when(() -> Store.findById(2L)).thenReturn(null);
+    WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
+    assertEquals(404, ex.getResponse().getStatus());
   }
+}
 
   @Test
   void createSuccessAndPresetIdValidation() {

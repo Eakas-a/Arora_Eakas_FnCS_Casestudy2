@@ -64,16 +64,16 @@ class WarehouseResourceImplUnitTest {
   }
 
   @Test
-  void listFiltersArchivedWarehousesAndMaps() {
-    DbWarehouse active = db(1L, "A", "LOC-A", 20, 5);
-    DbWarehouse archived = db(2L, "B", "LOC-B", 30, 6);
-    archived.archivedAt = LocalDateTime.now();
-    when(repository.getAll()).thenReturn(List.of(active, archived));
+void listFiltersArchivedWarehousesAndMaps() {
+  DbWarehouse active = db(1L, "A", "LOC-A", 20, 5);
+  DbWarehouse archived = db(2L, "B", "LOC-B", 30, 6);
+  archived.archivedAt = LocalDateTime.now();
+  when(repository.getAll()).thenReturn(List.of(active.toWarehouse(), archived.toWarehouse()));
 
-    List<com.warehouse.api.beans.Warehouse> result = resource.listAllWarehousesUnits();
-    assertEquals(1, result.size());
-    assertEquals("A", result.get(0).getBusinessUnitCode());
-  }
+  List<com.warehouse.api.beans.Warehouse> result = resource.listAllWarehousesUnits();
+  assertEquals(1, result.size());
+  assertEquals("A", result.get(0).getBusinessUnitCode());
+}
 
   @Test
   void createMapsCreatesAndReturnsCreatedWarehouse() {
