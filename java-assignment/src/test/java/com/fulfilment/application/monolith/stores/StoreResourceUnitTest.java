@@ -21,8 +21,8 @@ class StoreResourceUnitTest {
     Store a = mock(Store.class);
     a.name = "A";
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      // Use specific Sort instance
-      mocked.when(() -> Store.listAll(Sort.by("name"))).thenReturn(List.of(a));
+      // Use any(Sort.class) matcher for Sort parameter
+      mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
       assertEquals(List.of(a), resource.get());
     }
   }
@@ -33,11 +33,14 @@ class StoreResourceUnitTest {
     Store a = mock(Store.class);
     a.name = "A";
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      // Use specific literal values instead of matchers
-      mocked.when(() -> Store.findById(1L)).thenReturn(a);
+      // Use anyLong() matcher to handle any Long parameter
+      mocked.when(() -> Store.findById(anyLong())).thenAnswer(invocation -> {
+        Long id = invocation.getArgument(0);
+        if (id == 1L) return a;
+        return null;
+      });
       assertSame(a, resource.getSingle(1L));
 
-      mocked.when(() -> Store.findById(2L)).thenReturn(null);
       WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
       assertEquals(404, ex.getResponse().getStatus());
     }
@@ -71,17 +74,20 @@ class StoreResourceUnitTest {
 
     Store invalid = new Store();
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
+      // Setup for first scenario - any call returns null initially
+      mocked.when(() -> Store.findById(anyLong())).thenReturn(null);
+      
       WebApplicationException validation = assertThrows(WebApplicationException.class,
           () -> resource.update(1L, invalid));
       assertEquals(422, validation.getResponse().getStatus());
 
       Store updated = new Store("NEW");
       updated.quantityProductsInStock = 7;
-      mocked.when(() -> Store.findById(1L)).thenReturn(null);
       WebApplicationException missing = assertThrows(WebApplicationException.class,
           () -> resource.update(1L, updated));
       assertEquals(404, missing.getResponse().getStatus());
 
+      // Setup for second scenario - return existing store for id 2
       Store existing = new Store("OLD");
       mocked.when(() -> Store.findById(2L)).thenReturn(existing);
       Store result = resource.update(2L, updated);
@@ -105,12 +111,14 @@ class StoreResourceUnitTest {
     updated.quantityProductsInStock = 9;
 
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
+      // Setup for first patch - return existing store for id 1
       mocked.when(() -> Store.findById(1L)).thenReturn(existing);
 
       Store result = resource.patch(1L, updated);
       assertEquals("NEW", result.name);
       assertEquals(9, result.quantityProductsInStock);
 
+      // Setup for second patch - return nullNameZeroStock for id 2
       Store nullNameZeroStock = new Store();
       nullNameZeroStock.quantityProductsInStock = 0;
       mocked.when(() -> Store.findById(2L)).thenReturn(nullNameZeroStock);
@@ -133,15 +141,17 @@ class StoreResourceUnitTest {
           () -> resource.patch(1L, invalid));
       assertEquals(422, validation.getResponse().getStatus());
 
+      // Setup mock to handle different IDs differently
       mocked.when(() -> Store.findById(1L)).thenReturn(null);
+      mocked.when(() -> Store.findById(2L)).thenReturn(new Store("X"));
+      mocked.when(() -> Store.findById(3L)).thenReturn(null);
+
       WebApplicationException missingPatch = assertThrows(WebApplicationException.class,
           () -> resource.patch(1L, new Store("X")));
       assertEquals(404, missingPatch.getResponse().getStatus());
 
-      mocked.when(() -> Store.findById(2L)).thenReturn(new Store("X"));
       assertEquals(204, resource.delete(2L).getStatus());
 
-      mocked.when(() -> Store.findById(3L)).thenReturn(null);
       WebApplicationException missingDelete = assertThrows(WebApplicationException.class,
           () -> resource.delete(3L));
       assertEquals(404, missingDelete.getResponse().getStatus());
