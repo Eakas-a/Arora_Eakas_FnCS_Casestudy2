@@ -21,6 +21,7 @@ void getReturnsStores() {
   Store a = mock(Store.class);
   a.name = "A";
   try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
+    // Use a specific Sort instance or anySort matcher properly
     mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
     assertEquals(List.of(a), resource.get());
   }
@@ -32,10 +33,11 @@ void getSingleFoundAndMissing() {
   Store a = mock(Store.class);
   a.name = "A";
   try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-    mocked.when(() -> Store.findById(anyLong())).thenReturn(a);
+    // For static mocks, use ArgumentMatchers.anyLong() explicitly
+    mocked.when(() -> Store.findById(ArgumentMatchers.anyLong())).thenReturn(a);
     assertSame(a, resource.getSingle(1L));
 
-    mocked.when(() -> Store.findById(anyLong())).thenReturn(null);
+    mocked.when(() -> Store.findById(ArgumentMatchers.anyLong())).thenReturn(null);
     WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
     assertEquals(404, ex.getResponse().getStatus());
   }
