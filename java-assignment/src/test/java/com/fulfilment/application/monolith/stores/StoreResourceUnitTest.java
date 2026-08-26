@@ -22,7 +22,7 @@ class StoreResourceUnitTest {
     a.name = "A";
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
       // Use specific Sort instance
-      mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
+      mocked.when(() -> Store.listAll(Sort.by("name"))).thenReturn(List.of(a));
       assertEquals(List.of(a), resource.get());
     }
   }
