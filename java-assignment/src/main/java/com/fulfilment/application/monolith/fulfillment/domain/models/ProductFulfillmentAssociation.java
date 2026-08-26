@@ -17,6 +17,7 @@ import com.fulfilment.application.monolith.warehouses.adapters.database.DbWareho
  * package, behind the {@link com.fulfilment.application.monolith.fulfillment.domain.ports.FulfillmentAssociationRepository}
  * port.
  */
+@Entity
 public class ProductFulfillmentAssociation {
 
   public Long id;
