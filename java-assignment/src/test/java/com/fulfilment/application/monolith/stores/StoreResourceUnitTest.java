@@ -15,33 +15,33 @@ import org.mockito.MockedStatic;
 
 class StoreResourceUnitTest {
 
-@Test
-void getReturnsStores() {
-  StoreResource resource = new StoreResource();
-  Store a = mock(Store.class);
-  a.name = "A";
-  try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-    // Use a specific Sort instance or anySort matcher properly
-    mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
-    assertEquals(List.of(a), resource.get());
+  @Test
+  void getReturnsStores() {
+    StoreResource resource = new StoreResource();
+    Store a = mock(Store.class);
+    a.name = "A";
+    try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
+      // Use a specific Sort instance or anySort matcher properly
+      mocked.when(() -> Store.listAll(any(Sort.class))).thenReturn(List.of(a));
+      assertEquals(List.of(a), resource.get());
+    }
   }
-}
 
-@Test
-void getSingleFoundAndMissing() {
-  StoreResource resource = new StoreResource();
-  Store a = mock(Store.class);
-  a.name = "A";
-  try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-    // For static mocks, use anyLong() from the static import
-    mocked.when(() -> Store.findById(anyLong())).thenReturn(a);
-    assertSame(a, resource.getSingle(1L));
+  @Test
+  void getSingleFoundAndMissing() {
+    StoreResource resource = new StoreResource();
+    Store a = mock(Store.class);
+    a.name = "A";
+    try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
+      // For static mocks, use anyLong() from the static import
+      mocked.when(() -> Store.findById(anyLong())).thenReturn(a);
+      assertSame(a, resource.getSingle(1L));
 
-    mocked.when(() -> Store.findById(anyLong())).thenReturn(null);
-    WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
-    assertEquals(404, ex.getResponse().getStatus());
+      mocked.when(() -> Store.findById(anyLong())).thenReturn(null);
+      WebApplicationException ex = assertThrows(WebApplicationException.class, () -> resource.getSingle(2L));
+      assertEquals(404, ex.getResponse().getStatus());
+    }
   }
-}
 
   @Test
   void createSuccessAndPresetIdValidation() {
@@ -83,7 +83,7 @@ void getSingleFoundAndMissing() {
       assertEquals(404, missing.getResponse().getStatus());
 
       Store existing = new Store("OLD");
-      mocked.when(() -> Store.findById(2L)).thenReturn(existing);
+      mocked.when(() -> Store.findById(eq(2L))).thenReturn(existing);
       Store result = resource.update(2L, updated);
       assertSame(existing, result);
       assertEquals("NEW", existing.name);
@@ -105,7 +105,6 @@ void getSingleFoundAndMissing() {
     updated.quantityProductsInStock = 9;
 
     try (MockedStatic<Store> mocked = mockStatic(Store.class)) {
-      
       mocked.when(() -> Store.findById(eq(1L))).thenReturn(existing);
 
       Store result = resource.patch(1L, updated);
@@ -115,7 +114,6 @@ void getSingleFoundAndMissing() {
       Store nullNameZeroStock = new Store();
       nullNameZeroStock.quantityProductsInStock = 0;
       mocked.when(() -> Store.findById(eq(2L))).thenReturn(nullNameZeroStock);
-      //mocked.when(() -> Store.findById(2L)).thenReturn(nullNameZeroStock);
       Store second = resource.patch(2L, updated);
       assertNull(second.name);
       assertEquals(0, second.quantityProductsInStock);
